@@ -1,9 +1,10 @@
+from __future__ import annotations
 import typing
 import openpyxl.worksheet.worksheet
 import models, constants
 
 
-def get_substitutions(worksheet: openpyxl.worksheet.worksheet.Worksheet) -> typing.Generator[models.SubstitutionModel]:
+def parse_substitutions(worksheet: openpyxl.worksheet.worksheet.Worksheet) -> typing.Generator[models.SubstitutionModel]:
     def _get_period(*args, number: int) -> models.PeriodModel:
         return models.PeriodModel(
             data={
