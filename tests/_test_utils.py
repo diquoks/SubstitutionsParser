@@ -15,7 +15,7 @@ class BellsVariants(enum.Enum):
     Other = 2
 
 
-class BellsScheduleContainer(pyquoks.models.Container):
+class BellsScheduleListing(pyquoks.models.Listing):
     _DATA = {
         "variants": models.BellsVariantContainer,
     }
@@ -24,16 +24,16 @@ class BellsScheduleContainer(pyquoks.models.Container):
 
     def get_variant_by_weekday(
             self,
-            weekday: models.Weekdays,
+            weekday: models.Weekday,
     ) -> models.BellsVariantContainer:
         match weekday:
-            case models.Weekdays.MONDAY:
+            case models.Weekday.MONDAY:
                 return self.variants[BellsVariants.Monday.value]
-            case models.Weekdays.WEDNESDAY:
+            case models.Weekday.WEDNESDAY:
                 return self.variants[BellsVariants.Wednesday.value]
-            case models.Weekdays.TUESDAY | models.Weekdays.THURSDAY | models.Weekdays.FRIDAY | models.Weekdays.SATURDAY:
+            case models.Weekday.TUESDAY | models.Weekday.THURSDAY | models.Weekday.FRIDAY | models.Weekday.SATURDAY:
                 return self.variants[BellsVariants.Other.value]
-            case models.Weekdays.SUNDAY:
+            case models.Weekday.SUNDAY:
                 raise ValueError
 
 
@@ -43,11 +43,11 @@ class BellsScheduleContainer(pyquoks.models.Container):
 
 class DataProvider(pyquoks.data.DataProvider):
     _OBJECTS = {
-        "bells": BellsScheduleContainer
+        "bells": BellsScheduleListing
     }
 
     _PATH = pyquoks.utils.get_path("resources/data/")
 
-    bells: BellsScheduleContainer
+    bells: BellsScheduleListing
 
 # endregion

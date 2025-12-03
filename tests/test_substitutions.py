@@ -10,26 +10,44 @@ import models
 class TestSubstitutions(pyquoks.test.TestCase):
     _MODULE_NAME = __name__
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        super().setUpClass()
-
-        cls._WORKBOOKS = [
-            "substitutions",
-            "substitutions_old",
-        ]
-
     def test_parse_substitutions(self):
-        for filename in self._WORKBOOKS:
-            workbook = openpyxl.load_workbook(
-                filename=pyquoks.utils.get_path(f"resources/tables/{filename}.xlsx"),
+        workbook = openpyxl.load_workbook(
+            filename=pyquoks.utils.get_path("resources/tables/substitutions.xlsx"),
+        )
+
+        worksheet = workbook.worksheets[0]
+
+        for substitution in list(misc.parse_substitutions(worksheet)):
+            self.assert_type(
+                func_name=self.test_parse_substitutions.__name__,
+                test_data=substitution,
+                test_type=models.SubstitutionModel,
             )
 
-            worksheet = workbook.worksheets[0]
+    def test_parse_substitutions_incorrect(self):
+        workbook = openpyxl.load_workbook(
+            filename=pyquoks.utils.get_path("resources/tables/substitutions_incorrect.xlsx"),
+        )
 
-            for substitution in list(misc.parse_substitutions(worksheet)):
-                self.assert_type(
-                    func_name=self.test_parse_substitutions.__name__,
-                    test_data=substitution,
-                    test_type=models.SubstitutionModel,
-                )
+        worksheet = workbook.worksheets[0]
+
+        for substitution in list(misc.parse_substitutions(worksheet)):
+            self.assert_type(
+                func_name=self.test_parse_substitutions_incorrect.__name__,
+                test_data=substitution,
+                test_type=models.SubstitutionModel,
+            )
+
+    def test_parse_substitutions_old(self):
+        workbook = openpyxl.load_workbook(
+            filename=pyquoks.utils.get_path("resources/tables/substitutions_old.xlsx"),
+        )
+
+        worksheet = workbook.worksheets[0]
+
+        for substitution in list(misc.parse_substitutions(worksheet)):
+            self.assert_type(
+                func_name=self.test_parse_substitutions_old.__name__,
+                test_data=substitution,
+                test_type=models.SubstitutionModel,
+            )

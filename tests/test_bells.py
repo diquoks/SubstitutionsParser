@@ -16,8 +16,8 @@ class TestBells(pyquoks.test.TestCase):
         cls._data_provider = _test_utils.DataProvider()
 
     def test_get_variant_by_weekday(self) -> None:
-        for weekday in models.Weekdays:
-            if weekday != models.Weekdays.SUNDAY:
+        for weekday in models.Weekday:
+            if weekday != models.Weekday.SUNDAY:
                 self.assert_type(
                     func_name=self.test_get_variant_by_weekday.__name__,
                     test_data=self._data_provider.bells.get_variant_by_weekday(weekday),
@@ -28,5 +28,5 @@ class TestBells(pyquoks.test.TestCase):
             func_name=self.test_get_variant_by_weekday.__name__,
             test_func=self._data_provider.bells.get_variant_by_weekday,
             test_exception=ValueError,
-            weekday=models.Weekdays.SUNDAY,
+            weekday=models.Weekday.SUNDAY,
         )
