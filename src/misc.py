@@ -85,9 +85,9 @@ def parse_schedule(
 
             for cell in column:
                 current_column.append(cell)
-                if cell.border.bottom.style == "medium":
-                    current_columns.append(current_column)
-                    current_column = []
+                if cell.border.bottom.style == constants.SCHEDULE_DATA_WEEKDAY_BORDER:
+                    current_columns.append(current_column.copy())
+                    current_column.clear()
 
             split_columns.append(current_columns)
 
