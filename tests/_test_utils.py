@@ -4,7 +4,7 @@ import enum
 
 import pyquoks
 
-import models
+import schedule_parser
 
 
 # region models.py
@@ -15,25 +15,20 @@ class BellsVariants(enum.Enum):
     Other = 2
 
 
-class BellsScheduleListing(pyquoks.models.Listing):
-    _DATA = {
-        "variants": models.BellsVariantContainer,
-    }
-
-    variants: list[models.BellsVariantContainer]
-
+class BellsScheduleListing(schedule_parser.models.BellsScheduleListing):
     def get_variant_by_weekday(
             self,
-            weekday: models.Weekday,
-    ) -> models.BellsVariantContainer:
+            weekday: schedule_parser.models.Weekday,
+    ) -> schedule_parser.models.BellsVariantContainer:
         match weekday:
-            case models.Weekday.MONDAY:
+            case schedule_parser.models.Weekday.MONDAY:
                 return self.variants[BellsVariants.Monday.value]
-            case models.Weekday.WEDNESDAY:
+            case schedule_parser.models.Weekday.WEDNESDAY:
                 return self.variants[BellsVariants.Wednesday.value]
-            case models.Weekday.TUESDAY | models.Weekday.THURSDAY | models.Weekday.FRIDAY | models.Weekday.SATURDAY:
+            case schedule_parser.models.Weekday.TUESDAY | schedule_parser.models.Weekday.THURSDAY | \
+                 schedule_parser.models.Weekday.FRIDAY | schedule_parser.models.Weekday.SATURDAY:
                 return self.variants[BellsVariants.Other.value]
-            case models.Weekday.SUNDAY:
+            case schedule_parser.models.Weekday.SUNDAY:
                 raise ValueError
 
 

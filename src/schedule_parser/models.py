@@ -67,6 +67,23 @@ class PeriodModel(pyquoks.models.Model):
     def is_empty(self) -> bool:
         return not bool(self.lecturer and self.room and self.subject)
 
+    @property
+    def readable(self) -> str:
+        if self.is_empty:
+            raise ValueError("Period is empty!")
+        else:
+            return " | ".join([
+                " ".join(i for i in [
+                    f"{self.number}.",
+                    f"({self.subgroup})" if self.subgroup else "",
+                    self.subject,
+                ] if i),
+                self.formatted_room,
+            ])
+
+    def is_same(self, period: PeriodModel) -> bool:
+        return self.number == period.number and self.subgroup == period.subgroup
+
 
 class DayScheduleContainer(pyquoks.models.Container):
     _ATTRIBUTES = {
@@ -97,6 +114,17 @@ class WeekScheduleContainer(pyquoks.models.Container):
     parity: bool
     schedule: list[DayScheduleContainer]
 
+    def get_day_schedule_by_weekday(self, weekday: Weekday) -> DayScheduleContainer | None:
+        try:
+            return list(
+                filter(
+                    lambda schedule: schedule.weekday == weekday.value,
+                    self.schedule,
+                )
+            )[0]
+        except IndexError:
+            raise ValueError(f"Could not find schedule for weekday: {weekday!r}")
+
 
 class GroupScheduleContainer(pyquoks.models.Container):
     _ATTRIBUTES = {
@@ -110,6 +138,17 @@ class GroupScheduleContainer(pyquoks.models.Container):
     group: str
     schedule: list[WeekScheduleContainer]
 
+    def get_week_schedule_by_parity(self, parity: bool) -> WeekScheduleContainer | None:
+        try:
+            return list(
+                filter(
+                    lambda schedule: schedule.parity == parity,
+                    self.schedule,
+                )
+            )[0]
+        except IndexError:
+            raise ValueError(f"Could not find schedule for parity: {parity!r}")
+
 
 class GroupSchedulesListing(pyquoks.models.Listing):
     _DATA = {
@@ -117,6 +156,17 @@ class GroupSchedulesListing(pyquoks.models.Listing):
     }
 
     schedule: list[GroupScheduleContainer]
+
+    def get_group_schedule(self, group: str) -> GroupScheduleContainer | None:
+        try:
+            return list(
+                filter(
+                    lambda schedule: schedule.group == group,
+                    self.schedule,
+                )
+            )[0]
+        except IndexError:
+            raise ValueError(f"Could not find schedule for group: {group!r}")
 
 
 class SubstitutionModel(pyquoks.models.Model):
@@ -149,6 +199,14 @@ class SubstitutionsListing(pyquoks.models.Listing):
 
     substitutions: list[SubstitutionModel]
 
+    def get_substitutions_by_group(self, group: str) -> list[SubstitutionModel]:
+        return list(
+            filter(
+                lambda substitution: substitution.group == group,
+                self.substitutions,
+            )
+        )
+
 
 class BellsVariantContainer(pyquoks.models.Container):
     _DATA = {
@@ -156,5 +214,25 @@ class BellsVariantContainer(pyquoks.models.Container):
     }
 
     bells: list[str]
+
+    def format_period(self, period: PeriodModel) -> str:
+        return " | ".join([
+            self.bells[period.number],
+            period.readable,
+        ])
+
+
+class BellsScheduleListing(pyquoks.models.Listing):
+    _DATA = {
+        "variants": BellsVariantContainer,
+    }
+
+    variants: list[BellsVariantContainer]
+
+    def get_variant_by_weekday(
+            self,
+            weekday: Weekday,
+    ) -> BellsVariantContainer:
+        raise NotImplementedError()
 
 # endregion
